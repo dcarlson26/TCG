@@ -39,6 +39,48 @@
             transform: scale(1.02);
             transition: transform 0.1s;
         }
+        #cart {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 260px;
+            max-height: 80vh;
+            overflow-y: auto;
+
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        #selectedList {
+            margin-top: 10px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between; /* pushes left/right apart */
+            align-items: center;
+
+            border-bottom: 1px solid #eee;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+
+        .cart-item button {
+            margin-left: 4px;
+        }
+
+        @media (max-width: 600px) {
+            #cart {
+                position: static;
+                width: auto;
+                margin: 10px;
+            }
+        }
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #121212;
@@ -56,13 +98,40 @@
                 border: 1px solid #555;
             }
         }
+        @media (prefers-color-scheme: dark) {
+            #cart {
+                background-color: #1e1e1e;
+                color: #ffffff;
+                border: 1px solid #444;
+            }
+
+            .cart-item {
+                border-bottom: 1px solid #444;
+            }
+
+            button {
+                background-color: #2a2a2a;
+                color: #ffffff;
+                border: 1px solid #555;
+            }
+        }
     </style>
 </head>
 <body>
 
-<h2>Search Products</h2>
+<h2>Pokemon card trade</h2>
 <input type="text" id="search" placeholder="Search..." />
 <button id="searchBtn">Search</button>
+<div id="cart">
+    <h3>Selected Cards</h3>
+
+    <div id="totals"></div>
+
+    <div id="selectedList"></div>
+
+    <button onclick="clearAll()">Clear All</button>
+</div>
+<!--<button id="clearBtn">Clear All</button>-->
 <div id="results">Type and press Enter to search</div>
 
 <script src="TCG_Grid_app.js"></script>
