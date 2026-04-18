@@ -9,9 +9,22 @@ if (saved) {
 
 async function loadData() {
     //update to data_local.txt later
-    const response = await fetch("data.txt");
+    const response = await fetch(`data.txt?v=${Date.now()}`);
     const text = await response.text();
+    const lines = text.split("\n").filter(line => line.trim() !== "");
 
+    let version = "unknown";
+
+    // Check first line for version
+    if (lines.length > 0 && lines[0].startsWith("#version=")) {
+        version = lines[0].split("=")[1];
+        lines.shift(); // remove version line
+    }
+    
+    if (currVersion && currVersion !== version) {
+        console.log("Data updated!");
+    }
+        
     products = text.split("\n")
         .filter(line => line.trim() !== "")
         .map(line => {
@@ -24,6 +37,8 @@ async function loadData() {
                 id: parts[4]
             };
         });
+    
+    localStorage.setItem("dataVersion", version);
 }
 
 function render(results) {
