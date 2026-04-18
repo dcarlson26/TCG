@@ -12,6 +12,7 @@ async function loadData() {
     const response = await fetch(`data.txt?v=${Date.now()}`);
     const text = await response.text();
     const lines = text.split("\n").filter(line => line.trim() !== "");
+    const currVersion = localStorage.getItem("dataVersion")
 
     let version = "unknown";
 
