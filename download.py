@@ -1,10 +1,29 @@
 import requests
+import time
 from collections import defaultdict
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--only-cards",
+    action="store_true",
+    help="Only include products that are cards"
+)
+
+args = parser.parse_args()
+
+def get_extended_value(product, key_name):
+    for item in product.get("extendedData", []):
+        if item.get("name") == key_name:
+            return item.get("value")
+    return None
 
 pokemon_category = '3'
+version = str(int(time.time()))
 
 # Open the file in write mode ('w' to overwrite or 'a' to append)
 with open("data.txt", "w") as file:
+    file.write(f"#version={version}\n")
     try:
         r = requests.get(f"https://tcgcsv.com/tcgplayer/{pokemon_category}/groups")
         r.raise_for_status()  # Will raise an exception for HTTP errors
@@ -37,9 +56,17 @@ with open("data.txt", "w") as file:
                 # Build lookup: id -> list of name entries
                 name_lookup = defaultdict(list)
                 img_lookup = defaultdict(list)
+                allowed_product_ids = set()
                 for product in products:
                     name_lookup[product['productId']].append(product['name'])  
                     img_lookup[product['productId']].append(product['imageUrl'])
+                    if args.only_cards:
+                        rarity = get_extended_value(product, "Rarity")
+                        card_number = get_extended_value(product, "Number")
+
+                        if rarity is None or card_number is None:
+                            continue  #skip this product
+                    allowed_product_ids.add(product["productId"])
 
             except Exception as e:
                 file.write(f"Failed to fetch products for group {group_id}: {e}\n")
@@ -64,8 +91,11 @@ with open("data.txt", "w") as file:
                urls=img_lookup.get(product_id, 'Unknown')
                name_str = ", ".join(names)
                imageUrl = ", ".join(urls)
+               if product_id not in allowed_product_ids:
+                    #print(f"Skipping price for excluded product: {name_str}-{product_id}")
+                    continue
+               
                file.write(f"{name_str}|{p['subTypeName']}|{p['marketPrice']}|{imageUrl}|{product_id}\n")
     
     except requests.exceptions.RequestException as e:
         file.write(f"An error occurred: {e}\n")
-
