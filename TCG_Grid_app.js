@@ -198,6 +198,34 @@ document.getElementById("search").addEventListener("keydown", (e) => {
 
 document.getElementById("searchBtn").addEventListener("click", runSearch);
 
+const div = document.createElement("div");
+div.className = "cart-item";
+
+const text = document.createElement("div");
+text.className = "cart-text";
+text.innerHTML = `
+    <b>${card.name}</b>
+    (${card.qty}) - $${(card.price * card.qty).toFixed(2)}
+`;
+
+const actions = document.createElement("div");
+actions.className = "cart-actions";
+
+const addBtn = document.createElement("button");
+addBtn.textContent = "+";
+addBtn.onclick = () => addCard(id, card.name, card.price);
+
+const removeBtn = document.createElement("button");
+removeBtn.textContent = "-";
+removeBtn.onclick = () => removeCard(id);
+
+actions.appendChild(addBtn);
+actions.appendChild(removeBtn);
+
+div.appendChild(text);
+div.appendChild(actions);
+
+
 //document.getElementById("clearBtn").addEventListener("click", clearAll);
 
 // init
