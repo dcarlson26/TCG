@@ -168,25 +168,28 @@ function renderSelectedCards() {
         div.className = "cart-item";
 
         const text = document.createElement("div");
+        text.className = "cart-text";
         text.innerHTML = `
-            <b>${card.name || "Unknown"}</b><br/>
-            Qty: ${card.qty || 0} | $${card.price?.toFixed(2) || "0.00"}
+            <b>${card.name}</b>
+            (${card.qty}) - $${(card.price * card.qty).toFixed(2)}
         `;
-        const btnContainer = document.createElement("div");
+
+        const actions = document.createElement("div");
+        actions.className = "cart-actions";
 
         const addBtn = document.createElement("button");
         addBtn.textContent = "+";
-        addBtn.addEventListener("click", () => addCard(id, card.name, card.price));
+        addBtn.onclick = () => addCard(id, card.name, card.price);
 
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "-";
-        removeBtn.addEventListener("click", () => removeCard(id));
+        removeBtn.onclick = () => removeCard(id);
 
-        btnContainer.appendChild(addBtn);
-        btnContainer.appendChild(removeBtn);
+        actions.appendChild(addBtn);
+        actions.appendChild(removeBtn);
+
         div.appendChild(text);
-        div.appendChild(btnContainer);
-        container.appendChild(div);
+        div.appendChild(actions);
     }
 }
 
@@ -197,34 +200,6 @@ document.getElementById("search").addEventListener("keydown", (e) => {
 });
 
 document.getElementById("searchBtn").addEventListener("click", runSearch);
-
-const div = document.createElement("div");
-div.className = "cart-item";
-
-const text = document.createElement("div");
-text.className = "cart-text";
-text.innerHTML = `
-    <b>${card.name}</b>
-    (${card.qty}) - $${(card.price * card.qty).toFixed(2)}
-`;
-
-const actions = document.createElement("div");
-actions.className = "cart-actions";
-
-const addBtn = document.createElement("button");
-addBtn.textContent = "+";
-addBtn.onclick = () => addCard(id, card.name, card.price);
-
-const removeBtn = document.createElement("button");
-removeBtn.textContent = "-";
-removeBtn.onclick = () => removeCard(id);
-
-actions.appendChild(addBtn);
-actions.appendChild(removeBtn);
-
-div.appendChild(text);
-div.appendChild(actions);
-
 
 //document.getElementById("clearBtn").addEventListener("click", clearAll);
 
