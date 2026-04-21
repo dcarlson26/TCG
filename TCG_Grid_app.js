@@ -169,9 +169,12 @@ function renderSelectedCards() {
 
         const text = document.createElement("div");
         text.className = "cart-text";
+
         text.innerHTML = `
-            <b>${card.name}</b>
-            (${card.qty}) - $${(card.price * card.qty).toFixed(2)}
+            <div class="card-name">${card.name}</div>
+            <div class="card-meta">
+                Qty: ${card.qty} | $${(card.price * card.qty).toFixed(2)}
+            </div>
         `;
 
         const actions = document.createElement("div");

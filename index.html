@@ -76,9 +76,8 @@
         .cart-text {
             flex: 1;
             min-width: 0;          
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            white-space: normal;        
+            word-break: break-word;     
         }
 
         .cart-actions {
@@ -88,7 +87,14 @@
         .cart-actions button {
             flex-shrink: 0;
         }
+        .card-name {
+            font-weight: bold;
+        }
 
+        .card-meta {
+            font-size: 13px;
+            opacity: 0.8;
+        }
         @media (max-width: 600px) {
             body {
                 padding-bottom: 45vh; /* adjust to cart height */
