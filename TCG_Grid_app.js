@@ -190,6 +190,7 @@ function renderSelectedCards() {
 
         div.appendChild(text);
         div.appendChild(actions);
+        container.appendChild(div);
     }
 }
 
