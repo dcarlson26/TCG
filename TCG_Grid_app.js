@@ -166,7 +166,7 @@ function runSearch() {
 
         return tokens.every(token => searchable.includes(token));
     });
-
+    filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
     render(filtered);
 }
 
