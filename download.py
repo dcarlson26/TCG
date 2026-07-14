@@ -44,7 +44,7 @@ with open("data.txt", "w") as file:
             #    continue
             
             #SW+SH onwards
-            if group_id < 2545 and not group_id == 1729: 
+            if group_id < 2545 and not group_id == 1729 and not group_id == 1465: 
                 continue
                 
             try:
