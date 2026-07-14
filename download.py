@@ -2,7 +2,9 @@ import requests
 import time
 from collections import defaultdict
 import argparse
-
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+}
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--only-cards",
@@ -25,7 +27,8 @@ version = str(int(time.time()))
 with open("data.txt", "w") as file:
     file.write(f"#version={version}\n")
     try:
-        r = requests.get(f"https://tcgcsv.com/tcgplayer/{pokemon_category}/groups")
+        r = requests.get(f"https://tcgcsv.com/tcgplayer/{pokemon_category}/groups",
+                         headers=headers)
         r.raise_for_status()  # Will raise an exception for HTTP errors
         all_groups = r.json().get('results', [])
         
@@ -35,17 +38,18 @@ with open("data.txt", "w") as file:
         for group in all_groups:
             
             group_id = group['groupId']
+            group_name = group['name']
             #Perfect Order Only for testing
             #if group_id != 24587:
             #    continue
             
             #SW+SH onwards
-            if group_id < 2545: 
+            if group_id < 2545 and not group_id == 1729: 
                 continue
                 
             try:
                 # Fetch products for the group
-                r = requests.get(f"https://tcgcsv.com/tcgplayer/{pokemon_category}/{group_id}/products")
+                r = requests.get(f"https://tcgcsv.com/tcgplayer/{pokemon_category}/{group_id}/products",headers=headers)
                 r.raise_for_status()
                 products = r.json().get('results', [])
                 if not products:
@@ -56,14 +60,18 @@ with open("data.txt", "w") as file:
                 # Build lookup: id -> list of name entries
                 name_lookup = defaultdict(list)
                 img_lookup = defaultdict(list)
+                rarity_lookup = {}
+                card_number_lookup = {}
                 allowed_product_ids = set()
                 for product in products:
                     name_lookup[product['productId']].append(product['name'])  
                     img_lookup[product['productId']].append(product['imageUrl'])
                     if args.only_cards:
+                        #if product["name"] == "Mega Greninja ex - 122/086":print(product["extendedData"])
                         rarity = get_extended_value(product, "Rarity")
                         card_number = get_extended_value(product, "Number")
-
+                        rarity_lookup[product["productId"]] = rarity
+                        card_number_lookup[product["productId"]] = card_number
                         if rarity is None or card_number is None:
                             continue  #skip this product
                     allowed_product_ids.add(product["productId"])
@@ -73,7 +81,7 @@ with open("data.txt", "w") as file:
             
             try:
                 # Fetch prices for the group
-                r = requests.get(f"https://tcgcsv.com/tcgplayer/{pokemon_category}/{group_id}/prices")
+                r = requests.get(f"https://tcgcsv.com/tcgplayer/{pokemon_category}/{group_id}/prices",headers=headers)
                 r.raise_for_status()
                 prices = r.json().get('results', [])
                 if not prices:
@@ -89,13 +97,14 @@ with open("data.txt", "w") as file:
                product_id = p["productId"]
                names=name_lookup.get(product_id, 'Unknown')
                urls=img_lookup.get(product_id, 'Unknown')
+               rarity = rarity_lookup.get(product_id)
+               card_number = card_number_lookup.get(product_id)
                name_str = ", ".join(names)
                imageUrl = ", ".join(urls)
                if product_id not in allowed_product_ids:
                     #print(f"Skipping price for excluded product: {name_str}-{product_id}")
                     continue
-               
-               file.write(f"{name_str}|{p['subTypeName']}|{p['marketPrice']}|{imageUrl}|{product_id}\n")
+               file.write(f"{name_str}|{p['subTypeName']}|{p['marketPrice']}|{imageUrl}|{card_number}|{rarity}|{group_name}|{product_id}\n")
     
     except requests.exceptions.RequestException as e:
         file.write(f"An error occurred: {e}\n")
