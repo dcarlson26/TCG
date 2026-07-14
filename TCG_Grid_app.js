@@ -35,7 +35,10 @@ async function loadData() {
                 subtype: parts[1],
                 price: parts[2],
                 image: parts[3],
-                id: parts[4]
+                cardNumber: parts[4], //unreliable
+                rarity: parts[5],  //unreliable
+                setName: parts[6],
+                id: parts[7]
             };
         });
     
@@ -140,19 +143,29 @@ function updateTotals() {
     `;
 }
 
+function normalize(text) {
+    return text
+        .toLowerCase()
+        .replace(/[^\w\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
 function runSearch() {
     const input = document.getElementById("search");
     const value = input.value.toLowerCase();
 
     if (!value.trim()) return;
 
-    let filtered = products
-        .filter(p =>
-            p.name.toLowerCase().includes(value) &&
-            p.price !== "None" &&
-            !isNaN(parseFloat(p.price))
-        )
-        .sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+    const tokens = normalize(value).split(/\s+/);
+
+    const filtered = products.filter(product => {
+        const searchable = normalize(
+            product.name + " " + product.setName
+        );
+
+        return tokens.every(token => searchable.includes(token));
+    });
 
     render(filtered);
 }
