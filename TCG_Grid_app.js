@@ -59,6 +59,7 @@ function render(results) {
                 <b>${p.name}</b><br/>
                 ${p.subtype}<br/>
                 $${p.price}<br/>
+                ${p.setName}<br/>
             </div>
         `;
 
