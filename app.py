@@ -3,36 +3,22 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from backend.database import initialize_database
+from backend.models import Transaction
+from backend.database import save_transaction
+from backend.database import get_cards
 
 initialize_database()
 app = FastAPI()
 
-from backend.models import inventory
-from backend.database import add_inventory
+@app.post("/api/transactions")
+def save(transaction: Transaction):
 
-@app.post("/api/inventory")
-def create_inventory(inventory: inventory):
-
-    add_inventory(
-        inventory.product_id,
-        inventory.inventory_method,
-        inventory.inventory_price,
-        inventory.condition,
-        inventory.inventory_date,
-        inventory.notes,
-    )
+    save_transaction(transaction)
 
     return {"success": True}
-
-from backend.models import inventory
-from backend.database import add_inventory
-
-from backend.database import get_all_inventory
-
-@app.get("/api/inventory")
-def inventory():
-
-    return get_all_inventory()
+@app.get("/api/cards")
+def get_cards_endpoint():
+    return get_cards()
 
 frontend_dir = Path(__file__).parent.parent / "frontend"
 
